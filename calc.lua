@@ -3,7 +3,7 @@
 	
 	My extension of the string library
 ]]
-
+os.execute("mode con: cols=50 lines=20")
 
 local StringFunctions = {}
 
@@ -355,17 +355,23 @@ function StringFunctions:setSubstitutionOptions(options)
       ceil = function(n)
         return math.ceil(self:getResultFromMathExpression(n))
       end,
-      min = function(a, b)
-        return math.min(
-          self:getResultFromMathExpression(a),
-          self:getResultFromMathExpression(b)
-        )
+      min = function(...)
+        local args = {}
+
+        for k, v in next, {...} do
+          args[#args + 1] = self:getResultFromMathExpression(v)
+        end
+
+        return math.min(unpack(args))
       end,
-      max = function(a, b)
-        return math.max(
-          self:getResultFromMathExpression(a),
-          self:getResultFromMathExpression(b)
-        )
+      max = function(...)
+        local args = {}
+
+        for k, v in next, {...} do
+          args[#args + 1] = self:getResultFromMathExpression(v)
+        end
+
+        return math.max(unpack(args))
       end,
     }
   };
@@ -407,11 +413,19 @@ end
 StringFunctions:setSubstitutionOptions()
 
 while true do
+  local input
+
   local s,m = pcall(function()
-    local input = io.read()
+    io.write("> ")
+    input = io.read()
+
     local num = StringFunctions:getResultFromMathExpression(StringFunctions:substitute(input))
     print(num)
   end)
+
+  if input == "exit" then
+    break
+  end
 
   if not s then
     print(m)
